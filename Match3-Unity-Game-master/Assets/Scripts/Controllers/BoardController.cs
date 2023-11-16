@@ -22,6 +22,7 @@ public class BoardController : MonoBehaviour
     private Collider2D m_hitCollider;
 
     private GameSettings m_gameSettings;
+    private ItemInfoSO m_itemInfoSO;
 
     private List<Cell> m_potentialMatch;
 
@@ -31,7 +32,7 @@ public class BoardController : MonoBehaviour
 
     private bool m_gameOver;
 
-    public void StartGame(GameManager gameManager, GameSettings gameSettings)
+    public void StartGame(GameManager gameManager, GameSettings gameSettings, ItemInfoSO itemInfoSO, ItemNormalObject m_itemNormalObject)
     {
         m_gameManager = gameManager;
 
@@ -41,9 +42,14 @@ public class BoardController : MonoBehaviour
 
         m_cam = Camera.main;
 
-        m_board = new Board(this.transform, gameSettings);
+        m_board = new Board(this.transform, gameSettings, itemInfoSO, m_itemNormalObject);
 
         Fill();
+    }
+
+    public void RePlayLevel()
+    {
+
     }
 
     private void Fill()
@@ -224,7 +230,7 @@ public class BoardController : MonoBehaviour
             matches[i].ExplodeItem();
         }
 
-        if(matches.Count > m_gameSettings.MatchesMin)
+        if (matches.Count > m_gameSettings.MatchesMin)
         {
             m_board.ConvertNormalToBonus(matches, cellEnd);
         }

@@ -23,18 +23,29 @@ public class Board
 
     private Transform m_root;
 
+    private ItemInfoSO m_itemInfoSO;
+
     private int m_matchMin;
 
-    public Board(Transform transform, GameSettings gameSettings)
+    private NormalItem.eNormalType[,] m_typeCaches;
+
+    private ItemNormalObject m_itemNormalObject;
+
+    public Board(Transform transform, GameSettings gameSettings, ItemInfoSO itemInfoSO, ItemNormalObject itemNormalObject)
     {
         m_root = transform;
 
         m_matchMin = gameSettings.MatchesMin;
 
+        m_itemInfoSO = itemInfoSO;
+
+        m_itemNormalObject = itemNormalObject;
+
         this.boardSizeX = gameSettings.BoardSizeX;
         this.boardSizeY = gameSettings.BoardSizeY;
 
         m_cells = new Cell[boardSizeX, boardSizeY];
+        m_typeCaches = new NormalItem.eNormalType[boardSizeX, boardSizeY];
 
         CreateBoard();
     }
@@ -72,6 +83,7 @@ public class Board
 
     }
 
+
     internal void Fill()
     {
         for (int x = 0; x < boardSizeX; x++)
@@ -100,12 +112,25 @@ public class Board
                     }
                 }
 
-                item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
-                item.SetView();
+                var type = Utils.GetRandomNormalTypeExcept(types.ToArray());
+                m_typeCaches[x, y] = type;
+                item.SetType(type);
+                item.SetView(m_itemNormalObject, m_itemInfoSO.GetSprite(type));
                 item.SetViewRoot(m_root);
 
                 cell.Assign(item);
                 cell.ApplyItemPosition(false);
+            }
+        }
+    }
+
+    internal void ReFill()
+    {
+        for (int x = 0; x < m_typeCaches.GetLength(0); x++)
+        {
+            for (int y = 0; y < m_typeCaches.GetLength(1); y++)
+            {
+
             }
         }
     }
@@ -147,8 +172,9 @@ public class Board
 
                 NormalItem item = new NormalItem();
 
-                item.SetType(Utils.GetRandomNormalType());
-                item.SetView();
+                var type = Utils.GetRandomNormalType();
+                item.SetType(type);
+                item.SetView(m_itemNormalObject, m_itemInfoSO.GetSprite(type));
                 item.SetViewRoot(m_root);
 
                 cell.Assign(item);
@@ -350,7 +376,7 @@ public class Board
         var dir = GetMatchDirection(matches);
 
         var bonus = matches.Where(x => x.Item is BonusItem).FirstOrDefault();
-        if(bonus == null)
+        if (bonus == null)
         {
             return matches;
         }

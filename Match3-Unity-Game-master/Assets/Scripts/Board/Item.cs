@@ -12,7 +12,7 @@ public class Item
     public Transform View { get; private set; }
 
 
-    public virtual void SetView()
+    public void SetView()
     {
         string prefabname = GetPrefabName();
 
@@ -26,7 +26,25 @@ public class Item
         }
     }
 
+    private ItemNormalObject itemNormalCurrent;
+
+    public void SetView(ItemNormalObject itemNormalObject, Sprite sprite)
+    {
+        if (itemNormalCurrent == null)
+        {
+            var prb = ItemNormalObject.Instantiate(itemNormalObject);
+            prb.SetSprite(sprite);
+            View = prb.transform;
+        }
+        else
+        {
+            itemNormalCurrent.SetSprite(sprite);
+        }
+    }
+
     protected virtual string GetPrefabName() { return string.Empty; }
+
+    protected virtual NormalItem.eNormalType GetENormalType() { return NormalItem.eNormalType.TYPE_ONE; }
 
     public virtual void SetCell(Cell cell)
     {
